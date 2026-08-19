@@ -21,9 +21,9 @@ func TestConfigHeap(t *testing.T) {
 				Name:              GLOBAL,
 				Tick:              time.Second,
 				Max:               1,
-				Burst:             2,
-				BurstPeriod:       time.Second * 5,
-				Backpressure:      IgnoreBackpressure,
+				Burst:             3,
+				BurstPeriod:       time.Second * 2,
+				Backpressure:      DelayBackpressure,
 				Throttle:          time.Second * 5,
 				ThrottlePhaseOver: make(chan bool),
 				Hits:              make(AccessCache),
@@ -45,9 +45,10 @@ func TestConfigHeap(t *testing.T) {
 			} else {
 				atomic.AddInt64(&failed, 1)
 			}
-			fmt.Printf("Request(%d) done, result = %s, reason = %s\n", i, strconv.FormatBool(result), reason)
+			fmt.Printf("Request(%d) done, result = %s, reason = %s\n", i + 1, strconv.FormatBool(result), reason)
 		})
 	}
 	wg.Wait()
+	limiter.Wait()
 	fmt.Printf("%d, %d\n", passes, failed)
 }
